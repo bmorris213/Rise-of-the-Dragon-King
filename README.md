@@ -32,3 +32,18 @@ Main Menu
 	access options, extras, credits etc
 	new game action
 	plays intro scenematic
+
+Save File Manager
+	used to save, load, and delete save game files
+
+Overworld
+	For the sake of development, this is the "outer most" scene
+
+# Gameplay
+
+# controls
+movement: arrow keys (left, right, up, down)
+select : z
+cancel : x
+menu : c
+quit : escape (exit program)
