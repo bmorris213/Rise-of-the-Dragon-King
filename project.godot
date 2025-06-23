@@ -14,6 +14,10 @@ config/name="Rise of the Dragon King"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameState="*res://globals/GameState.gd"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

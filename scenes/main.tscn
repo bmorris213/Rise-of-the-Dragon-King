@@ -1,3 +1,13 @@
 [gd_scene format=3 uid="uid://bjt61oatwgur5"]
 
 [node name="Main" type="Node2D"]
+
+[node name="SceneLoader" type="Node" parent="."]
+
+[node name="GlobalUI" type="CanvasLayer" parent="."]
+
+[node name="DialogueUI" type="CanvasLayer" parent="."]
+
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
+
+[node name="FXLayer" type="CanvasLayer" parent="."]
