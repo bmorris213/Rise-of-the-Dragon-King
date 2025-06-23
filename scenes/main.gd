@@ -14,4 +14,4 @@ extends Node2D
 func _ready():
 	# load in the first scene
 	SceneLoader.set_container($ActiveScene)
-	SceneLoader.set_scene("res://scenes/system/main_menu.tscn") # replace with res://scenes/system/main_menu.tscn
+	SceneLoader.set_scene(Constants.OVERWORLD_SCENE_PATH) # replace with main menu
