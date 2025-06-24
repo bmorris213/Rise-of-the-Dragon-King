@@ -21,6 +21,10 @@ GameState="*res://globals/GameState.gd"
 SceneLoader="*res://globals/SceneLoader.gd"
 Constants="*res://globals/Constants.gd"
 
+[display]
+
+window/stretch/scale=1.69
+
 [input]
 
 up={
