@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 06-23-2025
+# 06-29-2025
 # Brian Morris
 
 extends Control
@@ -30,7 +30,7 @@ var input_delay := MAX_DELAY
 # ready
 # called once on startup of the scene
 func _ready():
-	update_selection()
+	call_deferred("update_selection")
 
 # process
 # called once per frame
@@ -91,8 +91,39 @@ func move_selector():
 # used to change UI elements to update a new selection
 func update_selection():
 	if selector_icon and selected_index < options.size():
-		var label = options[selected_index]
-		selector_icon.global_position = label.global_position + offset
+		selector_icon.global_position = options[selected_index].global_position + offset
+
+# set choices
+# used to generate choice scripts and attach them to the options
+func set_choices(choices : Array):
+	options = []
+	for choice in choices:
+		_create_option(choice)
+
+# create option
+# makes a new label option using choice information
+func _create_option(choice : Dictionary):
+	var label = Label.new()
+	
+	label.set("size_flags_horizontal", 2)
+	label.set("custom_minimum_size", Vector2(100, 0))
+	label.set("vertical_alignment", 1)
+	label.set("horizontal_alignment", 1)
+	var label_settings = load("res://assets/fonts/label_font.tres")
+	label.set("label_settings", label_settings)
+	
+	label.text = choice.text
+	label.set("callable", Callable(choice.function))
+	
+	add_child(label)
+	options.append(label)
+
+# unset choices
+# once an option is made, we need to clear out the data
+func unset_choices():
+	for option in options:
+		option.free()
+	options = []
 
 func on_option_selected():
-	options[selected_index].on_select()
+	options[selected_index].get("callable").call()

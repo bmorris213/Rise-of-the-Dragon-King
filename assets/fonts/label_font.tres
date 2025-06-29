@@ -1,0 +1,8 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://ds64xsaqw7u2f"]
+
+[ext_resource type="FontFile" uid="uid://nln3rhxol8vf" path="res://assets/fonts/Orange Kid.otf" id="1_e86tc"]
+
+[resource]
+font = ExtResource("1_e86tc")
+font_size = 14
+font_color = Color(0, 0, 0, 1)

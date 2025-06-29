@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 06-23-2025
+# 06-29-2025
 # Brian Morris
 
 extends Node
@@ -11,6 +11,9 @@ class_name MenuManager
 
 # stack of all nesting menus accessed
 var menu_stack := []
+
+# main control variable for accepting input
+var active := false
 
 # default first menu
 @export var base_menu : Menu = null
@@ -24,6 +27,9 @@ func _ready():
 # unhandled input
 # handle UI input
 func _unhandled_input(event):
+	if not active:
+		return
+	
 	if event.is_action_released("left"):
 		menu_stack[-1].move_left()
 	elif event.is_action_released("right"):

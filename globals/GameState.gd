@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 06-23-2025
+# 06-24-2025
 # Brian Morris
 
 extends Node
@@ -42,3 +42,8 @@ func save_game():
 
 func load_game():
 	print("Loading game... (not implemented)")
+
+# pause
+# used for switching control scheme between menu and player controllers
+static func pause():
+	SceneLoader.current_scene.active = not SceneLoader.current_scene.active

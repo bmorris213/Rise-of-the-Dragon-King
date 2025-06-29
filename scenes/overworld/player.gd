@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 06-23-2025
+# 06-24-2025
 # Brian Morris
 
 extends Node2D
@@ -18,8 +18,14 @@ class_name OverworldPlayer
 var is_moving := false
 var move_dir := Vector2i.ZERO
 
-# 
+# external values
 var tile_size = 16
+
+# ready
+# called once at startup
+func _ready():
+	animator.set("parameters/Walk/blend_position", Vector2i.DOWN)
+	animator.set("parameters/idle/blend_position", Vector2i.DOWN)
 
 # physical process
 # is called once per frame of the physics engine

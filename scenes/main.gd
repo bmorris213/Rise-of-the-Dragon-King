@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 06-23-2025
+# 06-29-2025
 # Brian Morris
 
 extends Node2D
@@ -15,3 +15,6 @@ func _ready():
 	# load in the first scene
 	SceneLoader.set_container($ActiveScene)
 	SceneLoader.set_scene(Constants.OVERWORLD_SCENE_PATH) # replace with main menu
+	
+	# set up dialogue reader
+	DialogueReader.set_parent($GlobalUI/Hud/CanvasLayer/DialogueBox)
