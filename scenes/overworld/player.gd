@@ -13,13 +13,14 @@ class_name OverworldPlayer
 @onready var grid_mover : GridMover = $GridMover
 @onready var animator : AnimationTree = $AnimationTree
 @onready var state_machine = animator.get("parameters/playback")
+@export var collision_layer : TileMapLayer = null
 
 # control variables
 var is_moving := false
 var move_dir := Vector2i.ZERO
 
 # external values
-var tile_size = 16
+@onready var tile_size = collision_layer.get("rendering_quadrant_size")
 
 # ready
 # called once at startup
@@ -71,4 +72,5 @@ func end_move():
 # can move
 # collision test for grid movement
 func can_move(target : Vector2):
-	return true
+	var grid_location = collision_layer.local_to_map(target)
+	return collision_layer.get_cell_source_id(grid_location) == -1
