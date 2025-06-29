@@ -14,10 +14,12 @@ class_name OverworldPlayer
 @onready var animator : AnimationTree = $AnimationTree
 @onready var state_machine = animator.get("parameters/playback")
 @export var collision_layer : TileMapLayer = null
+@export var terrain_layer : TileMapLayer = null
 
 # control variables
 var is_moving := false
 var move_dir := Vector2i.ZERO
+var current_terrain := 0
 
 # external values
 @onready var tile_size = collision_layer.get("rendering_quadrant_size")
@@ -27,6 +29,9 @@ var move_dir := Vector2i.ZERO
 func _ready():
 	animator.set("parameters/Walk/blend_position", Vector2i.DOWN)
 	animator.set("parameters/idle/blend_position", Vector2i.DOWN)
+	
+	# update terrain we're in
+	_update_terrain(global_position)
 
 # physical process
 # is called once per frame of the physics engine
@@ -54,6 +59,9 @@ func _physics_process(_delta):
 	if !can_move(target_pos):
 		return
 	
+	# update eventual terrain
+	_update_terrain(target_pos)
+	
 	# push mover
 	grid_mover.move_to(target_pos)
 
@@ -74,3 +82,11 @@ func end_move():
 func can_move(target : Vector2):
 	var grid_location = collision_layer.local_to_map(target)
 	return collision_layer.get_cell_source_id(grid_location) == -1
+
+# update terrain
+# check for a tile under our feet and detect terrain info
+func _update_terrain(target):
+	var grid_location = terrain_layer.local_to_map(target)
+	var data = terrain_layer.get_cell_alternative_tile(grid_location)
+	
+	current_terrain = data
