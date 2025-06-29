@@ -18,8 +18,8 @@ var player_exp := 0
 var current_region := "Accordia"
 var current_scene := "overworld"
 
-# signals for interactions with game state
-signal stats_updated # emit_signal("stats_updated")
+# control state for scene delegation
+var game_is_paused := false
 
 # inventory
 var inventory := {
@@ -45,5 +45,8 @@ func load_game():
 
 # pause
 # used for switching control scheme between menu and player controllers
-static func pause():
-	SceneLoader.current_scene.active = not SceneLoader.current_scene.active
+func pause():
+	game_is_paused = not game_is_paused
+
+func _process(_delta):
+	SceneLoader.current_scene.active = not game_is_paused

@@ -14,6 +14,7 @@ var selected_index := 0
 
 # game objects
 @export var options : Array[Node] = []
+var option_functions : Dictionary
 
 # menu acceleration logic
 var input_direction := 0
@@ -64,7 +65,7 @@ func end_selector_movement(direction):
 	input_direction = 0
 
 # move left
-func move_left():
+func move_to_start():
 	# skip over calls if movement is still being made or selection is already min
 	if input_direction != 0 or selected_index == 0:
 		return
@@ -73,7 +74,7 @@ func move_left():
 	update_selection()
 
 # move right
-func move_right():
+func move_to_end():
 	# skip over calls if movement is still being made or selection is already max
 	if input_direction != 0 or selected_index == options.size() - 1:
 		return
@@ -113,7 +114,8 @@ func _create_option(choice : Dictionary):
 	label.set("label_settings", label_settings)
 	
 	label.text = choice.text
-	label.set("callable", Callable(choice.function))
+	
+	option_functions[label.text] = choice.function
 	
 	add_child(label)
 	options.append(label)
@@ -124,6 +126,9 @@ func unset_choices():
 	for option in options:
 		option.free()
 	options = []
+	option_functions = {}
 
 func on_option_selected():
-	options[selected_index].get("callable").call()
+	var function = option_functions[options[selected_index].text]
+	if function and function is Callable and function.is_valid():
+		function.call()

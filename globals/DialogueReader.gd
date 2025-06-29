@@ -25,20 +25,20 @@ enum TypingSpeed {
 }
 
 # UI references
-var dialogue_box : MenuManager = null
-var title : Label = null
+var dialogue_box : Node = null
+var label_title : Label = null
 var text : Label = null
 var choice_container : Node = null
+var asking := false
 
 # set parent
 # setup function to grab UI references
 func set_parent(root : Node):
 	dialogue_box = root
-	title = root.get_child(0).get_child(0).get_child(0)
+	label_title = root.get_child(0).get_child(0).get_child(0)
 	text = root.get_child(0).get_child(1)
 	choice_container = root.get_child(0).get_child(2)
 	choice_container.visible = false
-	dialogue_box.active = false
 	dialogue_box.visible = false
 
 # process
@@ -47,6 +47,24 @@ func _process(delta):
 	if not message_active:
 		return
 	
+	# close dialogue action
+	if Input.is_action_just_pressed("menu"):
+		end_dialogue()
+		return
+	
+	# handle option menu
+	if asking:
+		if Input.is_action_just_pressed("left"):
+			choice_container.move_to_start()
+		elif Input.is_action_just_pressed("right"):
+			choice_container.move_to_end()
+		elif Input.is_action_just_pressed("select"):
+			choice_container.on_option_selected()
+			choice_container.selected_index = 0
+			show_next_line()
+		return
+	
+	# handle dialogue animation
 	if Input.is_action_just_pressed("cancel"):
 		is_rapid = true
 	
@@ -55,8 +73,13 @@ func _process(delta):
 	
 	if Input.is_action_just_pressed("select"):
 		show_next_line()
+		return
 	
 	if is_animating == false:
+		return
+	
+	if line_index >= current_line.text.length():
+		_finish_line()
 		return
 	
 	timer += delta * typing_speed
@@ -70,19 +93,18 @@ func _process(delta):
 	line_index += 1
 	timer = 0.0
 	_update_box()
-	_check_for_choices()
 
 # start dialogue
 # public api to send messages to the UI
 func start_dialogue(dialogue_lines : Array):
 	if message_active:
-		print("error: dialogue spam")
 		return
 	
 	dialogue_queue = dialogue_lines.duplicate(true)
 	message_active = true
 	dialogue_box.visible = true
 	show_next_line()
+	GameState.pause()
 
 # show next line
 # progresses the dialogue
@@ -95,11 +117,12 @@ func show_next_line():
 		end_dialogue()
 		return
 	
-	if dialogue_box.active:
+	if asking:
 		clear_options()
+		asking = false
 	
 	current_line = dialogue_queue.pop_front()
-	title.text = current_line.name
+	label_title.text = current_line.name
 	
 	buffer = ""
 	_update_box()
@@ -120,22 +143,26 @@ func _update_box():
 
 # wrapping up dialogue reading
 func end_dialogue():
+	if asking:
+		choice_container.selector_icon.visible = false
+		choice_container.visible = false
+		clear_options()
+		asking = false
 	dialogue_box.visible = false
 	message_active = false
 	is_animating = false
-	GameState.call_deferred("pause")
+	buffer = ""
+	GameState.pause()
 
 # check for choices
 # generates choice labels and options, but only if there are choices
 func _check_for_choices():
-	if line_index >= current_line.text.length():
-		is_animating = false
-		if not current_line.choices.is_empty():
-			dialogue_box.active = true
-			choice_container.visible = true
-			choice_container.selector_icon.visible = true
-			choice_container.set_choices(current_line.choices)
-			choice_container.call_deferred("update_selection")
+	if not current_line.choices.is_empty():
+		asking = true
+		choice_container.visible = true
+		choice_container.selector_icon.visible = true
+		choice_container.set_choices(current_line.choices)
+		choice_container.call_deferred("update_selection")
 
 # clear options
 # once an option is chosen, the options menu should be emptied
@@ -143,4 +170,3 @@ func clear_options():
 	choice_container.unset_choices()
 	choice_container.selector_icon.visible = false
 	choice_container.visible = false
-	dialogue_box.active = false

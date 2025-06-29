@@ -1,7 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://byjox2dyqkg6"]
+[gd_scene load_steps=5 format=3 uid="uid://byjox2dyqkg6"]
 
 [ext_resource type="Texture2D" uid="uid://cvy08xdeth6al" path="res://assets/images/box.png" id="1_5yk18"]
-[ext_resource type="Script" path="res://scripts/managers/menu_manager.gd" id="2_yvib5"]
 [ext_resource type="LabelSettings" uid="uid://ds64xsaqw7u2f" path="res://assets/fonts/label_font.tres" id="3_0e7oq"]
 [ext_resource type="Script" path="res://scripts/ui/menu.gd" id="3_4483d"]
 [ext_resource type="Texture2D" uid="uid://bklfko8s1shh3" path="res://assets/images/selector.png" id="4_g1s4q"]
@@ -16,7 +15,7 @@ grow_vertical = 2
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="DialogueBox" type="TextureRect" parent="CanvasLayer" node_paths=PackedStringArray("base_menu")]
+[node name="DialogueBox" type="TextureRect" parent="CanvasLayer"]
 custom_minimum_size = Vector2(600, 100)
 anchors_preset = 7
 anchor_left = 0.5
@@ -27,8 +26,6 @@ grow_horizontal = 2
 grow_vertical = 0
 texture = ExtResource("1_5yk18")
 expand_mode = 1
-script = ExtResource("2_yvib5")
-base_menu = NodePath("VBoxContainer/Choices")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DialogueBox"]
 layout_mode = 1
