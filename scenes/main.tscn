@@ -1,19 +1,13 @@
-[gd_scene load_steps=3 format=3 uid="uid://bjt61oatwgur5"]
+[gd_scene load_steps=3 format=3 uid="uid://cc1y3glapql5e"]
 
-[ext_resource type="Script" path="res://scenes/main.gd" id="1_dgqyf"]
-[ext_resource type="PackedScene" uid="uid://byjox2dyqkg6" path="res://scenes/UI/HUD.tscn" id="2_l04db"]
+[ext_resource type="Script" path="res://scenes/main.gd" id="1_xiocn"]
+[ext_resource type="PackedScene" uid="uid://dbnl1ecoo68hy" path="res://scenes/menus/GlobalUI.tscn" id="2_e4v83"]
 
 [node name="Main" type="Node2D"]
-script = ExtResource("1_dgqyf")
+script = ExtResource("1_xiocn")
 
 [node name="ActiveScene" type="Node" parent="."]
 
-[node name="GlobalUI" type="CanvasLayer" parent="."]
+[node name="GlobalUI" parent="." instance=ExtResource("2_e4v83")]
 
-[node name="Hud" parent="GlobalUI" instance=ExtResource("2_l04db")]
-
-[node name="DialogueUI" type="CanvasLayer" parent="."]
-
-[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
-
-[node name="FXLayer" type="CanvasLayer" parent="."]
+[node name="GlobalAudio" type="AudioStreamPlayer" parent="."]

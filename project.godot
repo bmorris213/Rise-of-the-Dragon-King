@@ -17,10 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-GameState="*res://globals/GameState.gd"
-SceneLoader="*res://globals/SceneLoader.gd"
-Constants="*res://globals/Constants.gd"
-DialogueReader="*res://globals/DialogueReader.gd"
+GameManager="*res://globals/GameManager.gd"
 
 [display]
 
