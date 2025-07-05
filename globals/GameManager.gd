@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 07-03-2025
+# 07-05-2025
 # Brian Morris
 
 extends Node
@@ -56,9 +56,12 @@ func setup_global_scene(root : Node):
 
 # process
 # called once per frame
-func _process(_delta):
+func _process(delta : float):
 	# ask ControlManager to handle input and take action
 	control_manager.handle_input()
+	
+	# pass delta to ControlManager
+	control_manager.process(delta)
 
 # get quick action
 # returns the action assigned to that direction choice in the quick key menu

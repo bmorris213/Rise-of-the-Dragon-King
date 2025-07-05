@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 07-03-2025
+# 07-05-2025
 # Brian Morris
 
 extends Node
@@ -14,7 +14,6 @@ var _menu_stack := []
 var _active_menu : Menu
 
 enum Menus {
-	hud,
 	pause_menu,
 	quick_menu,
 	dialogue_box
@@ -22,7 +21,6 @@ enum Menus {
 
 # node references of global ui
 var _canvas : CanvasLayer
-var _hud : Menu
 var _pause_menu : Menu
 var _quick_menu : Menu
 var _dialogue_box : Menu
@@ -68,7 +66,6 @@ func _process(delta : float):
 # establishes the target canvas layer, as well as grabbing other menu references
 func set_canvas(target_node : CanvasLayer):
 	_canvas = target_node
-	_hud = _canvas.find_child(Constants.HUD_NAME)
 	_pause_menu = _canvas.find_child(Constants.PAUSE_MENU_NAME)
 	_quick_menu = _canvas.find_child(Constants.QUICK_MENU_NAME)
 	_dialogue_box = _canvas.find_child(Constants.DIALOGUE_BOX_NAME)
@@ -88,8 +85,6 @@ func _attach_menu(new_menu : Menu):
 func open_menu(target : Menus):
 	close_menus()
 	match(target):
-		Menus.hud:
-			_attach_menu(_hud)
 		Menus.pause_menu:
 			_attach_menu(_pause_menu)
 		Menus.quick_menu:
@@ -160,7 +155,8 @@ func signal_quitting(progress_amount : float = 0.0):
 	_quit_warning.get_child(0).modulate.a = alpha
 	
 	# update warning text
-	var string_formatter = { "time" : "%.2f" % (1.0/30.0 * progress_amount)}
+	var remaining_sec := 3.0 - (progress_amount * 3.0)
+	var string_formatter = { "time" : "%.2f" % remaining_sec}
 	var quit_warning := "Quitting in {time}...".format(string_formatter)
 	_quit_warning.get_child(0).get_child(0).text = quit_warning
 

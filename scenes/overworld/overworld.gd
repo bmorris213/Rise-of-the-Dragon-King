@@ -13,18 +13,13 @@ var _animator
 var _state_machine
 
 # tilemap node references
-@onready var _ground_layer := $GroundLayer
 @onready var _collision_layer := $CollisionLayer
-@onready var _terrain_layer := $TerrainLayer
-
-# values for region
-var _region_danger := 0.2 # weights random value towards minimum or maximum
 
 # values for player
 var is_walking := false # determines sprite animation to play
 var _previous_walking_state := false
-var _previous_terrain
 var steps := 0
+var _step_goal : int
 
 # test locations
 var locations = { # lets just call these INTERACTABLES, since thats the only OBJECT style detail on the world map
@@ -78,6 +73,7 @@ func _ready():
 	_state_machine = _animator.get("parameters/playback")
 	_player.teleport(_player.global_position)
 	_player.move_speed = 4
+	_set_random_goal()
 
 # process
 # called once per frame
@@ -97,7 +93,7 @@ func _process(_delta):
 # attempts a move in the given direction
 func try_move(direction : Vector2i) -> bool:
 	_player.global_position = _player.get_location()
-	var target = _player.global_position + Vector2(direction * _ground_layer.tile_set.tile_size)
+	var target = _player.global_position + Vector2(direction * _collision_layer.tile_set.tile_size)
 	if _can_move_to(_player.global_position, target):
 		_player.move_to(target)
 		is_walking = true
@@ -132,52 +128,17 @@ func _can_move_to(start_pos : Vector2, end_pos : Vector2) -> bool:
 # function called after every tile of movement
 func took_step(_position : Vector2):
 	steps += 1
-	var grid_location = _terrain_layer.local_to_map(_position)
-	var data = _terrain_layer.get_cell_alternative_tile(grid_location)
-	if _previous_terrain != data:
-		_previous_terrain = data
-		var step_goal = _get_terrain_step_goal()
-		print(steps, step_goal)
-		if steps >= step_goal:
-			GameManager.scene_manager.start_battle({
-				"terrain" : _previous_terrain,
-				"region" : _region_danger
-			})
+	print(steps, " : " ,_step_goal)
+	if steps >= _step_goal:
+		_set_random_goal()
+		steps = 0
+		print("battle start")
 
-
-# get random try
-# a function to retrieve battle chance based on the maps terrain data
-func _get_terrain_step_goal() -> float:
-	# find terrain's min and max steps
-	var min_step := 15
-	var max_step := 25
-	match(_previous_terrain):
-		1:
-			min_step = 12
-			max_step = 21
-		2:
-			min_step = 10
-			max_step = 18
-		3:
-			min_step = 6
-			max_step = 15
-		4:
-			min_step = 3
-			max_step = 12
-	
-	# generate random value
+# random goal
+# assigns a new random step goal to reach before battle
+func _set_random_goal():
 	var r = GameManager.random_generator.randf()
-	
-	# weight value with region danger
-	if _region_danger < 0.5:
-		# low danger, weight r towards 1
-		pass
-	elif _region_danger > 0.5:
-		# high danger, weight r towards 0
-		pass
-	
-	# apply weighted random value
-	return lerp(min_step, max_step, r)
+	_step_goal = lerp(6, 15, r)
 
 func try_select():
 	if 1 == 1:

@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 07-03-2025
+# 07-05-2025
 # Brian Morris
 
 # Constants
@@ -53,7 +53,6 @@ const TILES_NODE_PATH := "/Ground Layer"
 # menu node references
 const SELECTOR_NAME := "Selector"
 const OPTION_CONTAINER_NAME := "Options"
-const HUD_NAME := "HUD"
 const PAUSE_MENU_NAME := "PauseMenu"
 const QUICK_MENU_NAME := "QuickMenu"
 const DIALOGUE_BOX_NAME := "DialogueBox"

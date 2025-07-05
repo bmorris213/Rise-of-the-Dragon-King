@@ -1,5 +1,5 @@
 # Rise of the Dragon King
-# 07-03-2025
+# 07-05-2025
 # Brian Morris
 
 extends Node
@@ -29,7 +29,7 @@ var _quick_key_lock := false # distinguish between a toggle and hold of quick ke
 
 # process
 # called once per frame
-func _process(delta : float):
+func process(delta : float):
 	# update acceleration information
 	if _menu_direction != Vector2i.ZERO:
 		_menu_timer += delta
@@ -41,23 +41,12 @@ func _process(delta : float):
 	
 	# update quit timer
 	if _trying_to_quit:
+		# progress timer
 		_quit_timer += delta
 		GameManager.menu_manager.signal_quitting(_quit_timer / Constants.MENU_QUIT_DELAY)
 		
 		if _quit_timer >= Constants.MENU_QUIT_DELAY:
-			get_tree().quit() # exit game completely
-
-# unhandled input
-# called to catch uncaught input
-func _unhandled_input(event: InputEvent):
-	if _trying_to_quit:
-		if event.is_action_released("quit"):
-			_quit_timer = 0.0
-			_trying_to_quit = false
-			GameManager.menu_manager.signal_quitting(-1.0)
-	else:
-		if event.is_action_pressed("quit"):
-			_trying_to_quit = true
+			GameManager.get_tree().quit() # exit game completely
 
 # handle input
 # main control delegation loop
@@ -65,6 +54,16 @@ func handle_input():
 	# accommodate input lock
 	if _input_locked:
 		return
+	
+	# check for quit action start and end
+	if _trying_to_quit:
+		if not Input.is_action_pressed("quit"):
+			_trying_to_quit = false
+			GameManager.menu_manager.signal_quitting(-1.0)
+			_quit_timer = 0.0
+	elif Input.is_action_pressed("quit"):
+		_trying_to_quit = true
+		_quit_timer = 0.0
 	
 	# delegate to quick key menu
 	if _quick_key_active:
@@ -224,7 +223,7 @@ func interrupt(duration : float = Constants.MIN_INTERRUPT_DURATION):
 	_input_locked = true
 	
 	# wait the specified duration
-	await get_tree().create_timer(duration).timeout
+	await GameManager.get_tree().create_timer(duration).timeout
 	
 	# re-enable controls globally after a transition
 	_input_locked = false
