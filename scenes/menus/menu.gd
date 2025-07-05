@@ -123,7 +123,7 @@ func unset_choices(full_delete : bool = false):
 	for option in _options:
 		if option.temp or full_delete:
 			option.queue_free()
-	_options = []
+			_options.erase(option)
 
 # toggle selector
 # turns on or off the selector icon

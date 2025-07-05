@@ -13,7 +13,6 @@ class_name ControlManager
 var _input_locked := false
 var _quit_timer := 0.0
 var _trying_to_quit := false
-var _viewing_menu := false
 
 # menu control details
 var _menu_direction := Vector2i.ZERO
@@ -23,6 +22,7 @@ var _menu_delay := Constants.MENU_MAX_MAX_DELAY
 # active control details
 var _last_direction := Vector2i.ZERO
 var _action_buffer := ""
+var _move_buffer := Vector2i.ZERO
 var _player_is_moving := false
 var _quick_key_active := false
 var _quick_key_lock := false # distinguish between a toggle and hold of quick key menu
@@ -67,6 +67,16 @@ func handle_input():
 	
 	# delegate to quick key menu
 	if _quick_key_active:
+		# check for locking / unlocking
+		if _quick_key_lock:
+			if Input.is_action_pressed("cancel"):
+				_quick_key_lock = false
+		else:
+			if Input.is_action_just_released("cancel"):
+				_quick_key_active = false
+				GameManager.menu_manager.close_menus()
+				return
+		
 		# update changing selection
 		var quick_key_choice = Vector2i.ZERO
 		if Input.is_action_pressed("up"):
@@ -86,11 +96,10 @@ func handle_input():
 			GameManager.scene_manager.call_action(selected_action)
 			_quick_key_active = false
 			_quick_key_lock = false
-			pause(Constants.QUICK_ACTION_DELAY)
 		return
 	
 	# delegate to menu controls
-	if _viewing_menu:
+	if GameManager.menu_manager.viewing_menu():
 		# speed while speaking
 		if GameManager.menu_manager.is_speaking():
 			if Input.is_action_pressed("cancel"):
@@ -104,37 +113,33 @@ func handle_input():
 		if Input.is_action_just_pressed("select"):
 			GameManager.menu_manager.select()
 		elif Input.is_action_just_pressed("menu"):
-			pause()
 			GameManager.menu_manager.close_menus()
 		else:
 			_handle_menu_movement()
 		return
 	
-	# buffer actions until movement ends
+	# while in active control mode, cancel opens the quick menu
+	if Input.is_action_just_pressed("cancel"):
+		interrupt()
+		_quick_key_active = true
+		_quick_key_lock = true
+		GameManager.menu_manager.open_menu(MenuManager.Menus.quick_menu)
+		return
+	
+	# buffer actions and movement until movement ends
 	if _player_is_moving:
 		if Input.is_action_just_pressed("select"):
 			_action_buffer = "select"
 		elif Input.is_action_just_pressed("menu"):
 			_action_buffer = "menu"
-		return
-	
-	# check for opening and closing quick key menu
-	if _quick_key_active:
-		if _quick_key_lock:
-			if Input.is_action_pressed("cancel"):
-				_quick_key_lock = false
-				return
-		else:
-			if Input.is_action_just_released("cancel"):
-				_quick_key_active = false
-				GameManager.menu_manager.close_menus()
-				pause()
-				return
-	elif Input.is_action_just_pressed("cancel"):
-		_quick_key_active = true
-		_quick_key_lock = true
-		pause()
-		GameManager.menu_manager.open_menu(MenuManager.Menus.quick_menu)
+		if Input.is_action_just_pressed("up") and _last_direction != Vector2i.UP:
+			_move_buffer = Vector2i.UP
+		if Input.is_action_just_pressed("down") and _last_direction != Vector2i.DOWN:
+			_move_buffer = Vector2i.DOWN
+		if Input.is_action_just_pressed("left") and _last_direction != Vector2i.LEFT:
+			_move_buffer = Vector2i.LEFT
+		if Input.is_action_just_pressed("right") and _last_direction != Vector2i.RIGHT:
+			_move_buffer = Vector2i.RIGHT
 		return
 	
 	# check for a stored action buffer
@@ -145,65 +150,71 @@ func handle_input():
 				_action_buffer = ""
 				return
 			"menu":
-				pause()
 				GameManager.menu_manager.open_menu(MenuManager.Menus.pause_menu)
 				return
+	# check for a stored movement buffer
+	if _move_buffer == Vector2i.UP and _last_direction != Vector2i.UP:
+		_move_buffer = Vector2i.ZERO
+		_last_direction = Vector2i.UP
+		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
+		return
+	elif _move_buffer == Vector2i.DOWN and _last_direction != Vector2i.DOWN:
+		_move_buffer = Vector2i.ZERO
+		_last_direction = Vector2i.DOWN
+		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
+		return
+	elif _move_buffer == Vector2i.LEFT and _last_direction != Vector2i.LEFT:
+		_move_buffer = Vector2i.ZERO
+		_last_direction = Vector2i.LEFT
+		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
+		return
+	elif _move_buffer == Vector2i.RIGHT and _last_direction != Vector2i.RIGHT:
+		_move_buffer = Vector2i.ZERO
+		_last_direction = Vector2i.RIGHT
+		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
+		return
 	
 	# start a move or an action
 	if Input.is_action_just_pressed("select"):
 		GameManager.scene_manager.try_select()
 	elif Input.is_action_just_pressed("menu"):
-		pause()
 		GameManager.menu_manager.open_menu(MenuManager.Menus.pause_menu)
-	elif Input.is_action_pressed("up"):
+	elif Input.is_action_just_pressed("up"):
 		_last_direction = Vector2i.UP
 		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
-	elif Input.is_action_pressed("down"):
+	elif Input.is_action_just_pressed("down"):
 		_last_direction = Vector2i.DOWN
 		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
-	elif Input.is_action_pressed("left"):
+	elif Input.is_action_just_pressed("left"):
 		_last_direction = Vector2i.LEFT
 		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
-	elif Input.is_action_pressed("right"):
+	elif Input.is_action_just_pressed("right"):
 		_last_direction = Vector2i.RIGHT
 		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
 
 # will continue move
 # called once the mover stops at a new tile
 func will_continue_move() -> bool:
-	# once movement stops, detect if we want it to continue
+	# opening a menu stops movement
+	if GameManager.menu_manager.viewing_menu():
+		_move_buffer = Vector2i.ZERO
+		_player_is_moving = false
+		return false
+	
+	# we will only continue if the directional key is being held down
 	if (Input.is_action_pressed("up") and _last_direction == Vector2i.UP) or\
 	(Input.is_action_pressed("down") and _last_direction == Vector2i.DOWN) or\
 	(Input.is_action_pressed("left") and _last_direction == Vector2i.LEFT) or\
 	(Input.is_action_pressed("right") and _last_direction == Vector2i.RIGHT):
-		# clear buffer and move
+		# clear buffers and move
 		_action_buffer = ""
+		_move_buffer = Vector2i.ZERO
 		_player_is_moving = GameManager.scene_manager.move_player(_last_direction)
 		return true
 	
 	 # movement has ended
 	_player_is_moving = false
-	
 	return false
-
-# pause
-# switches between active and menu control mode
-func pause(duration : float = Constants.MIN_INTERRUPT_DURATION):
-	# clear data
-	_last_direction = Vector2i.ZERO
-	_action_buffer = ""
-	
-	# cause a gameplay interrupt
-	interrupt(duration)
-	
-	# switch to the opposite of the current control mode
-	_viewing_menu = not _viewing_menu
-	
-	# disable quick key menu when pausing
-	if _viewing_menu and _quick_key_active:
-		_quick_key_active = false
-		_quick_key_lock = false
-		GameManager.menu_manager.close_menus()
 
 # interrupt
 # temporarily disables controls globally during a transition

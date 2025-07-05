@@ -96,7 +96,6 @@ offset_bottom = -4.0
 script = ExtResource("3_2vusy")
 
 [node name="QuickMenu" type="Control" parent="ScreenOrganizer/Viewport"]
-visible = false
 layout_mode = 1
 anchor_left = 0.35
 anchor_top = 0.1
@@ -157,13 +156,13 @@ offset_bottom = 116.0
 texture = ExtResource("4_oabfo")
 script = ExtResource("6_bwx5l")
 
-[node name="Selector" type="TextureRect" parent="ScreenOrganizer/Viewport/QuickMenu"]
+[node name="Selector" type="ColorRect" parent="ScreenOrganizer/Viewport/QuickMenu"]
 layout_mode = 0
-offset_left = 163.8
-offset_top = 51.0
-offset_right = 227.8
-offset_bottom = 115.0
-texture = ExtResource("1_kdjdg")
+offset_left = 161.8
+offset_top = 53.0
+offset_right = 225.8
+offset_bottom = 117.0
+color = Color(1, 1, 0.486275, 0.341176)
 
 [node name="Footer" type="ColorRect" parent="ScreenOrganizer"]
 custom_minimum_size = Vector2(0, 60)

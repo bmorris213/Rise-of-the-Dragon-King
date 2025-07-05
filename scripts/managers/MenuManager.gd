@@ -41,7 +41,7 @@ var _typing_speed = Constants.TYPING_SPEED.slow
 
 # process
 # called once per frame
-func _process(delta : float):
+func process(delta : float):
 	if not _is_animating:
 		return
 	
@@ -78,12 +78,12 @@ func _attach_menu(new_menu : Menu):
 	_menu_stack.append(new_menu)
 	_active_menu = new_menu
 	new_menu.visible = true
-	new_menu.grab_focus()
 
 # open menu
 # open up a default menu
 func open_menu(target : Menus):
 	close_menus()
+	_canvas.visible = true
 	match(target):
 		Menus.pause_menu:
 			_attach_menu(_pause_menu)
@@ -95,6 +95,7 @@ func open_menu(target : Menus):
 # close menu
 # ends the current menu session
 func close_menus():
+	_canvas.visible = false
 	rapid = false
 	for menu in _menu_stack:
 		_collapse_menu(menu)
@@ -106,7 +107,7 @@ func close_menus():
 func _collapse_menu(menu : Menu):
 	menu.move_selector_to(0)
 	menu.unset_choices()
-	menu.visable = false
+	menu.visible = false
 
 # move selector
 # changes the highlighted option on the active menu
@@ -172,6 +173,11 @@ func highlight_quick_key(direction : Vector2i):
 	}
 	_quick_menu.move_selector_to(direction_index[direction])
 
+# viewing menu
+# returns true if any menu is currently open
+func viewing_menu() -> bool:
+	return not _menu_stack.is_empty()
+
 # dialogue management
 
 # is speaking
@@ -223,6 +229,7 @@ func _update_box():
 func _end_dialogue():
 	_dialogue_box.visible = false
 	_is_animating = false
+	close_menus()
 	_buffer_string = ""
 	_timer = 0.0
 

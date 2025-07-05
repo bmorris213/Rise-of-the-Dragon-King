@@ -60,8 +60,9 @@ func _process(delta : float):
 	# ask ControlManager to handle input and take action
 	control_manager.handle_input()
 	
-	# pass delta to ControlManager
+	# pass delta to managers
 	control_manager.process(delta)
+	menu_manager.process(delta)
 
 # get quick action
 # returns the action assigned to that direction choice in the quick key menu

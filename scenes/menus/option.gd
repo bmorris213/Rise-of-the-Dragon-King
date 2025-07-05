@@ -11,14 +11,14 @@ class_name Option
 
 var _option_label : Label
 var _callable : Callable
-var _temp : bool
+var temp : bool
 
 # init
 # constructor for options
 func _init(label : Label = null, callable : Callable = _default_function, temporary : bool = false):
 	self._option_label = label
 	self._callable = callable
-	self._temp = temporary
+	self.temp = temporary
 
 # default function
 # a callable for options to use as a default

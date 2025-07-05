@@ -64,4 +64,4 @@ func call_action(action : Dictionary):
 # start battle
 # switches scenes to the battle screen when player triggers a random battle
 func start_battle(data : Dictionary):
-	print(data)
+	print(data) # WIP
